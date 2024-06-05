@@ -7,7 +7,7 @@ Original file is located at
     https://colab.research.google.com/drive/1hN_rqIUOCea-1Fvxk3dcurebYvHir9sf
 """
 
-2# Step 1: install essential libraries
+# install essential libraries
 !pip3 install librosa
 !pip install pydub
 !pip install torch torchvision torchaudio
@@ -33,34 +33,53 @@ if not exists(charsiu_dir):
 
 os.chdir(charsiu_dir)
 
-# Step 3: import essential libraries
+# import essential libraries for charsiu
 import sys
 import torch
 from itertools import groupby
 
 sys.path.insert(0,'src')
 
-# [optional step:] use your own data from your google drive
+# [optional step for using with colab:] use your own data from your google drive
 from google.colab import drive
 drive.mount('/content/drive/')
 
-#pretrained model. This one is textless
+#initializing a pretrained charsiu model. This one is textless
 
 from Charsiu import charsiu_predictive_aligner
 
-#initialize model
+#initialize charsiu model
 
 charsiu = charsiu_predictive_aligner(aligner='charsiu/en_w2v2_fc_10ms')
 
 from pydub import AudioSegment
 
-def give_me_music(wavfile_name):
+def give_me_music(wavfile_name):#function to get an instrumental version of speech stream
+"""
+    Convert a wav file of speech to instrumental sounds.
+
+    First the function resamples the orignal audio to 16000 Hz. This function uses a forced
+    aligner to segment speech sounds. Then it loops though speech sounds to create a list
+    with the types of speech sounds present. Then the list of types is looped through and
+    specific instrumental sounds are added to an empty audio segment. The instrumental audios
+    are also cliped to the length of the original speech sound as specified in the tuple
+    corresponding to that speech sound in the forced alignment. 
+
+    Parameters
+    ----------
+    user upload: wav file
+    
+    Returns
+    -------
+    mp3 file.
+    
+"""
 
     uploaded_wav = AudioSegment.from_file(wavfile_name)
     resampled_wav = uploaded_wav.set_frame_rate(16000)
     resampled_wav.export(wavfile_name, format="wav")
 
-    segments_list = charsiu.align(audio = wavfile_name)
+    segments_list = charsiu.align(audio = wavfile_name) # forced alignment of the input wav file
     instrumental_audio = []
     phoneme_list = []
     sound_list = []
@@ -104,10 +123,10 @@ def give_me_music(wavfile_name):
         selected_sound = phoneme_dict[each_phoneme]
         sound_list.append(selected_sound)
 
-    for each_sound in sound_list: # i want this to take the list of types and give mp3s
-        if each_sound in instrument_dict: # how to get mp3
-            selected_instrument = instrument_dict[each_sound]  #will give me value? from dict
-            instrumental_audio.append(selected_instrument) #can add just value to the audioclips list
+    for each_sound in sound_list: 
+        if each_sound in instrument_dict: 
+            selected_instrument = instrument_dict[each_sound]  
+            instrumental_audio.append(selected_instrument)
 
     for mp3_file, segment in zip(instrumental_audio, segments_list):
       audio = AudioSegment.from_mp3(mp3_file)
@@ -115,12 +134,30 @@ def give_me_music(wavfile_name):
       trimmed_audio = audio[50:int(duration*1000)]
       final_audio += trimmed_audio
 
-    return final_audio
+    return final_audio  #will generate an audio player to listen to the output
 
 #for speech sounds!
 from pydub import AudioSegment
 
 def speech_to_speech(wavfile_name):
+    """
+    Convert a wav file of speech to other speech sounds
+
+     First the function resamples the orignal audio to 16000 Hz. This function uses a forced
+    aligner to segment speech sounds. Then it loops though speech sounds to create a list
+    with the types of speech sounds present. Then the list of types is looped through and
+    specific speech sounds are added to an empty audio segment. The speech sound audios
+    are also cliped to the length of the original speech sound as specified in the tuple
+    corresponding to that speech sound in the forced alignment.  
+
+    Parameters
+    ----------
+    user upload: wav file
+    
+    Returns
+    -------
+    mp3 file.
+  """  
 
     uploaded_wav = AudioSegment.from_file(wavfile_name)
     resampled_wav = uploaded_wav.set_frame_rate(16000)
@@ -175,7 +212,7 @@ def speech_to_speech(wavfile_name):
       trimmed_audio = audio[50:int(duration*1000)]
       final_audio2 += trimmed_audio
 
-    return final_audio2
+    return final_audio2 #will generate an audio player to listen to the output
 
 @article{zhu2022charsiu,
   title={Phone-to-audio alignment without text: A Semi-supervised Approach},
