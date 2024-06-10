@@ -8,4 +8,10 @@ The main software my project involved was the forced aligner charsiu. I used the
 
 To run this project you will need to install the textless forced aligner from charsiu. This step is included in the py file.
 
-You will also need a folder of the instrumental sounds used to create the instrumental audio or the speech sounds for the speech sounds version. A link to download the instrumental sounds is located in replacementaudio.md
+You will also need a folder of the instrumental sounds used to create the instrumental audio or the speech sounds for the speech sounds version. You can download the 'sounds' folder from github or use this link. 
+
+https://drive.google.com/drive/folders/1q64gynZQsHGRACCGduampWhV9WTJrx_4?usp=sharing
+
+Note that you will need to change the path to the audio files to have the code access the right file. 
+
+
